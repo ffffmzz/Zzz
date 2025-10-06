@@ -1,532 +1,144 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>告白气球 - 周杰伦</title>
-   <script src="https://cdn.tailwindcss.com"></script>
-   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-   <script>
-       // 配置Tailwind自定义颜色和字体
-       tailwind.config = {
-           theme: {
-               extend: {
-                   colors: {
-                       primary: '#FF6B8A', // 浪漫粉色作为主色调
-                       secondary: '#8EB8E5', // 淡蓝色作为辅助色
-                       accent: '#FFD700', // 金色作为强调色
-                       dark: '#333333',
-                       light: '#F9F5F1'
-                   },
-                   fontFamily: {
-                       romantic: ['"Playfair Display"', 'serif'],
-                       sans: ['"Noto Sans SC"', 'sans-serif']
-                   }
-               }
-           }
-       }
-   </script>
-   <style type="text/tailwindcss">
-       @layer utilities {
-           .text-shadow {
-               text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-           }
-           .balloon-float {
-               animation: float 6s ease-in-out infinite;
-           }
-           .parallax {
-               background-attachment: fixed;
-               background-position: center;
-               background-repeat: no-repeat;
-               background-size: cover;
-           }
-           .lyric-highlight {
-               transition: all 0.3s ease;
-           }
-           .lyric-highlight:hover {
-               transform: scale(1.05);
-               color: #FF6B8A;
-           }
-       }
- 
-       @keyframes float {
-           0% { transform: translateY(0px) rotate(0deg); }
-           50% { transform: translateY(-20px) rotate(5deg); }
-           100% { transform: translateY(0px) rotate(0deg); }
-       }
-   </style>
-   <!-- 引入Google字体 -->
-   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Singapore PSI — Realtime Readings</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #f6f8fa; color: #111; }
+    header { background: #0b5fff; color: #fff; padding: 16px 20px; }
+    header h1 { margin: 0 0 4px; font-size: 20px; }
+    header small { opacity: .9; }
+    main { max-width: 1100px; margin: 20px auto; padding: 0 16px 40px; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .toolbar { display: flex; gap: 8px; align-items: center; padding: 12px 14px; border-bottom: 1px solid #e5e7eb; }
+    .toolbar button {
+      border: 1px solid #d1d5db; background: #fff; border-radius: 8px; padding: 8px 10px; cursor: pointer;
+    }
+    .toolbar .status { margin-left: auto; font-size: 12px; color: #374151; }
+    .wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border-bottom: 1px solid #f0f0f0; padding: 10px 12px; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: #fff; }
+    thead th { background: #f9fafb; font-weight: 600; }
+    tfoot td { background: #fafafa; font-size: 12px; color: #4b5563; }
+    .muted { color: #6b7280; }
+    .error { color: #b91c1c; }
+    .legend { padding: 10px 14px; font-size: 12px; color: #4b5563; border-top: 1px solid #e5e7eb; }
+    a { color: inherit; }
+  </style>
 </head>
-<body class="bg-light text-dark overflow-x-hidden">
-   <!-- 导航栏 -->
-   <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent">
-       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-           <a href="#" class="text-2xl font-romantic font-bold text-white text-shadow">告白气球</a>
-           <div class="hidden md:flex space-x-8">
-               <a href="#about" class="text-white hover:text-accent transition-colors">关于歌曲</a>
-               <a href="#lyrics" class="text-white hover:text-accent transition-colors">歌词</a>
-               <a href="#gallery" class="text-white hover:text-accent transition-colors">意境</a>
-               <a href="#quotes" class="text-white hover:text-accent transition-colors">乐评</a>
-           </div>
-           <button id="mobile-menu-button" class="md:hidden text-white text-2xl">
-               <i class="fa fa-bars"></i>
-           </button>
-       </div>
-       <!-- 移动端菜单 -->
-       <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-md">
-           <div class="container mx-auto px-4 py-4 flex flex-col space-y-4">
-               <a href="#about" class="text-dark hover:text-primary transition-colors py-2">关于歌曲</a>
-               <a href="#lyrics" class="text-dark hover:text-primary transition-colors py-2">歌词</a>
-               <a href="#gallery" class="text-dark hover:text-primary transition-colors py-2">意境</a>
-               <a href="#quotes" class="text-dark hover:text-primary transition-colors py-2">乐评</a>
-           </div>
-       </div>
-   </nav>
- 
-   <!-- 英雄区域 -->
-   <header class="relative h-screen flex items-center justify-center overflow-hidden">
-       <!-- 背景图 -->
-       <div class="absolute inset-0 z-0">
-           <img src="https://picsum.photos/id/1031/1920/1080" alt="巴黎街景，带有浪漫氛围" class="w-full h-full object-cover">
-           <div class="absolute inset-0 bg-dark/40"></div>
-       </div>
-       
-       <!-- 漂浮气球装饰 -->
-       <div class="absolute top-20 left-10 w-16 h-16 balloon-float" style="animation-delay: 0s;">
-           <img src="https://picsum.photos/id/306/100/100" alt="粉色气球" class="w-full h-full object-contain">
-       </div>
-       <div class="absolute top-40 right-20 w-20 h-20 balloon-float" style="animation-delay: 1s;">
-           <img src="https://picsum.photos/id/307/100/100" alt="蓝色气球" class="w-full h-full object-contain">
-       </div>
-       <div class="absolute bottom-40 left-1/4 w-18 h-18 balloon-float" style="animation-delay: 2s;">
-           <img src="https://picsum.photos/id/308/100/100" alt="黄色气球" class="w-full h-full object-contain">
-       </div>
-       
-       <!-- 标题内容 -->
-       <div class="container mx-auto px-4 z-10 text-center">
-           <h1 class="text-[clamp(2.5rem,8vw,5rem)] font-romantic font-bold text-white mb-6 text-shadow leading-tight">
-               告白气球
-           </h1>
-           <p class="text-[clamp(1rem,3vw,1.5rem)] text-white/90 mb-10 max-w-2xl mx-auto">
-               周杰伦 · 2016 · 床边故事
-           </p>
-           <a href="#about" class="inline-block bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-lg">
-               探索歌曲 <i class="fa fa-arrow-down ml-2"></i>
-           </a>
-       </div>
-       
-       <!-- 向下滚动提示 -->
-       <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
-           <i class="fa fa-angle-down text-3xl"></i>
-       </div>
-   </header>
- 
-   <!-- 关于歌曲 -->
-   <section id="about" class="py-20 bg-white">
-       <div class="container mx-auto px-4">
-           <div class="text-center mb-16">
-               <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-romantic font-bold mb-4">关于歌曲</h2>
-               <div class="w-24 h-1 bg-primary mx-auto"></div>
-           </div>
-           
-           <div class="grid md:grid-cols-2 gap-12 items-center">
-               <div>
-                   <img src="https://picsum.photos/id/429/600/400" alt="周杰伦告白气球专辑封面相关意境图" class="w-full h-auto rounded-lg shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
-               </div>
-               <div>
-                   <h3 class="text-2xl font-romantic font-semibold mb-6 text-primary">创作背景</h3>
-                   <p class="text-lg mb-6 leading-relaxed">
-                       《告白气球》是周杰伦2016年发行的专辑《周杰伦的床边故事》中的一首歌曲，由方文山作词，周杰伦作曲并演唱。
-                   </p>
-                   <p class="text-lg mb-6 leading-relaxed">
-                       歌曲灵感来源于巴黎的浪漫氛围，描绘了在塞纳河畔，情侣们的甜蜜互动与告白场景。轻快的旋律搭配浪漫的歌词，营造出一种轻松愉悦的爱情氛围。
-                   </p>
-                   <p class="text-lg mb-8 leading-relaxed">
-                       这首歌融合了流行与爵士元素，成为了华语乐坛的经典情歌，也让许多人对巴黎充满了浪漫想象。
-                   </p>
-                   
-                   <div class="flex flex-wrap gap-4">
-                       <div class="flex items-center bg-light px-4 py-2 rounded-full">
-                           <i class="fa fa-calendar text-primary mr-2"></i>
-                           <span>发行时间: 2016年6月24日</span>
-                       </div>
-                       <div class="flex items-center bg-light px-4 py-2 rounded-full">
-                           <i class="fa fa-music text-primary mr-2"></i>
-                           <span>风格: 流行、爵士</span>
-                       </div>
-                       <div class="flex items-center bg-light px-4 py-2 rounded-full">
-                           <i class="fa fa-trophy text-primary mr-2"></i>
-                           <span>获奖: 多次音乐榜单冠军</span>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </section>
- 
-   <!-- 歌词部分 -->
-   <section id="lyrics" class="py-20 bg-light relative overflow-hidden">
-       <!-- 背景装饰 -->
-       <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full"></div>
-       <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-secondary/10 rounded-full"></div>
-       
-       <div class="container mx-auto px-4 relative z-10">
-           <div class="text-center mb-16">
-               <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-romantic font-bold mb-4">歌词</h2>
-               <div class="w-24 h-1 bg-primary mx-auto"></div>
-               <p class="mt-4 text-gray-600 max-w-2xl mx-auto">感受字里行间的浪漫与甜蜜</p>
-           </div>
-           
-           <div class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-lg">
-               <div class="lyrics-container space-y-6 text-center">
-                   <p class="lyric-highlight text-lg md:text-xl">"塞纳河畔 左岸的咖啡 我手一杯 品尝你的美"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"留下唇印的嘴 花店玫瑰 名字写错谁"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"告白气球 风吹到对街 微笑在天上飞"</p>
-                   
-                   <div class="my-8">
-                       <audio id="song-player" controls class="w-full max-w-lg mx-auto">
-                           <source src="#" type="audio/mpeg">
-                           您的浏览器不支持音频播放
-                       </audio>
-                   </div>
-                   
-                   <p class="lyric-highlight text-lg md:text-xl">"你说你有点难追 想让我知难而退 礼物不需挑最贵"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"只要香榭的落叶 喔 营造浪漫的约会 不害怕搞砸一切"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"拥有你就拥有 全世界 亲爱的 爱上你 从那天起"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"甜蜜的很轻易 亲爱的 别任性 你的眼睛"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"在说我愿意 塞纳河畔 左岸的咖啡"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"我手一杯 品尝你的美 留下唇印的嘴"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"花店玫瑰 名字写错谁 告白气球 风吹到对街"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"微笑在天上飞 亲爱的 爱上你 从那天起"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"甜蜜的很轻易 亲爱的 别任性 你的眼睛"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"在说我愿意 亲爱的 爱上你 恋爱日记"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"飘香水的回忆 一整瓶 的梦境 全都有你"</p>
-                   <p class="lyric-highlight text-lg md:text-xl">"搅拌在一起 亲爱的别任性 你的眼睛 在说我愿意"</p>
-               </div>
-           </div>
-       </div>
-   </section>
- 
-   <!-- 意境画廊 -->
-   <section id="gallery" class="py-20 bg-white">
-       <div class="container mx-auto px-4">
-           <div class="text-center mb-16">
-               <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-romantic font-bold mb-4">歌曲意境</h2>
-               <div class="w-24 h-1 bg-primary mx-auto"></div>
-               <p class="mt-4 text-gray-600 max-w-2xl mx-auto">巴黎街头的浪漫场景，如同歌词描绘的那般美好</p>
-           </div>
-           
-           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               <div class="group relative overflow-hidden rounded-lg shadow-md">
-                   <img src="https://picsum.photos/id/1067/600/400" alt="巴黎街景，有咖啡馆和行人" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
-                   <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                       <p class="p-6 text-white">塞纳河畔的咖啡馆</p>
-                   </div>
-               </div>
-               
-               <div class="group relative overflow-hidden rounded-lg shadow-md">
-                   <img src="https://picsum.photos/id/1060/600/400" alt="巴黎的街道，有许多建筑" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
-                   <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                       <p class="p-6 text-white">漫步在巴黎街头</p>
-                   </div>
-               </div>
-               
-               <div class="group relative overflow-hidden rounded-lg shadow-md">
-                   <img src="https://picsum.photos/id/116/600/400" alt="浪漫的花店，有各种颜色的花" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
-                   <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                       <p class="p-6 text-white">街角的花店</p>
-                   </div>
-               </div>
-               
-               <div class="group relative overflow-hidden rounded-lg shadow-md">
-                   <img src="https://picsum.photos/id/1082/600/400" alt="漂浮的彩色气球" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
-                   <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                       <p class="p-6 text-white">告白气球</p>
-                   </div>
-               </div>
-               
-               <div class="group relative overflow-hidden rounded-lg shadow-md">
-                   <img src="https://picsum.photos/id/307/600/400" alt="情侣在浪漫的场景中互动" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
-                   <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                       <p class="p-6 text-white">甜蜜的约会</p>
-                   </div>
-               </div>
-               
-               <div class="group relative overflow-hidden rounded-lg shadow-md">
-                   <img src="https://picsum.photos/id/1056/600/400" alt="巴黎的建筑和街道" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110">
-                   <div class="absolute inset-0 bg-gradient-to-t from-dark/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                       <p class="p-6 text-white">香榭丽舍大街</p>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </section>
- 
-   <!-- 音乐播放区 -->
-   <section class="py-16 bg-primary/10">
-       <div class="container mx-auto px-4">
-           <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-               <div class="grid md:grid-cols-2">
-                   <div class="relative">
-                       <img src="https://picsum.photos/id/1074/600/800" alt="周杰伦告白气球专辑相关图片" class="w-full h-full object-cover">
-                       <div class="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                           <button id="play-button" class="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center text-3xl shadow-lg transform transition-transform hover:scale-110">
-                               <i class="fa fa-play"></i>
-                           </button>
-                       </div>
-                   </div>
-                   <div class="p-8 flex flex-col justify-center">
-                       <h3 class="text-3xl font-romantic font-bold mb-4">告白气球</h3>
-                       <p class="text-gray-600 mb-6">周杰伦 · 周杰伦的床边故事</p>
-                       
-                       <div class="space-y-6">
-                           <div>
-                               <div class="flex justify-between mb-2">
-                                   <span id="current-time" class="text-sm text-gray-500">0:00</span>
-                                   <span id="total-time" class="text-sm text-gray-500">3:35</span>
-                               </div>
-                               <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                   <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
-                               </div>
-                           </div>
-                           
-                           <div class="flex justify-between items-center">
-                               <button class="text-gray-500 hover:text-primary transition-colors">
-                                   <i class="fa fa-step-backward"></i>
-                               </button>
-                               <button id="play-button-small" class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-md">
-                                   <i class="fa fa-play"></i>
-                               </button>
-                               <button class="text-gray-500 hover:text-primary transition-colors">
-                                   <i class="fa fa-step-forward"></i>
-                               </button>
-                           </div>
-                           
-                           <div class="flex justify-between items-center pt-4">
-                               <button class="text-gray-500 hover:text-primary transition-colors">
-                                   <i class="fa fa-random"></i>
-                               </button>
-                               <button class="text-gray-500 hover:text-primary transition-colors">
-                                   <i class="fa fa-repeat"></i>
-                               </button>
-                               <button class="text-gray-500 hover:text-primary transition-colors">
-                                   <i class="fa fa-volume-up"></i>
-                               </button>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </section>
- 
-   <!-- 乐评部分 -->
-   <section id="quotes" class="py-20 bg-light">
-       <div class="container mx-auto px-4">
-           <div class="text-center mb-16">
-               <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-romantic font-bold mb-4">乐评与感悟</h2>
-               <div class="w-24 h-1 bg-primary mx-auto"></div>
-               <p class="mt-4 text-gray-600 max-w-2xl mx-auto">来自听众的真实感受</p>
-           </div>
-           
-           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-               <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                   <div class="text-primary text-4xl mb-4">
-                       <i class="fa fa-quote-left"></i>
-                   </div>
-                   <p class="text-gray-700 mb-6 italic">
-                       "每次听到这首歌，都会想起在巴黎街头漫步的日子，阳光、咖啡香和恋人的笑容，一切都那么美好。"
-                   </p>
-                   <div class="flex items-center">
-                       <img src="https://picsum.photos/id/64/100/100" alt="评论者头像" class="w-12 h-12 rounded-full object-cover mr-4">
-                       <div>
-                           <h4 class="font-medium">林小雨</h4>
-                           <p class="text-sm text-gray-500">音乐爱好者</p>
-                       </div>
-                   </div>
-               </div>
-               
-               <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                   <div class="text-primary text-4xl mb-4">
-                       <i class="fa fa-quote-left"></i>
-                   </div>
-                   <p class="text-gray-700 mb-6 italic">
-                       "周杰伦总能用旋律描绘出最美的画面，《告白气球》就是这样一首歌，轻松、甜蜜，让人忍不住跟着哼唱。"
-                   </p>
-                   <div class="flex items-center">
-                       <img src="https://picsum.photos/id/91/100/100" alt="评论者头像" class="w-12 h-12 rounded-full object-cover mr-4">
-                       <div>
-                           <h4 class="font-medium">王浩然</h4>
-                           <p class="text-sm text-gray-500">音乐博主</p>
-                       </div>
-                   </div>
-               </div>
-               
-               <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                   <div class="text-primary text-4xl mb-4">
-                       <i class="fa fa-quote-left"></i>
-                   </div>
-                   <p class="text-gray-700 mb-6 italic">
-                       "这首歌是我向女友告白时用的背景音乐，现在每次听到都能想起当时的紧张和幸福，感谢周杰伦创作了这么美的歌。"
-                   </p>
-                   <div class="flex items-center">
-                       <img src="https://picsum.photos/id/26/100/100" alt="评论者头像" class="w-12 h-12 rounded-full object-cover mr-4">
-                       <div>
-                           <h4 class="font-medium">陈明亮</h4>
-                           <p class="text-sm text-gray-500">忠实粉丝</p>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </section>
- 
-   <!-- 底部区域 -->
-   <footer class="bg-dark text-white py-12">
-       <div class="container mx-auto px-4">
-           <div class="flex flex-col md:flex-row justify-between items-center">
-               <div class="mb-8 md:mb-0">
-                   <h3 class="text-2xl font-romantic font-bold mb-2">告白气球</h3>
-                   <p class="text-gray-400">周杰伦 · 2016</p>
-               </div>
-               
-               <div class="flex space-x-6 mb-8 md:mb-0">
-                   <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
-                       <i class="fa fa-facebook"></i>
-                   </a>
-                   <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
-                       <i class="fa fa-twitter"></i>
-                   </a>
-                   <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
-                       <i class="fa fa-instagram"></i>
-                   </a>
-                   <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
-                       <i class="fa fa-youtube-play"></i>
-                   </a>
-               </div>
-               
-               <div>
-                   <p class="text-gray-400 text-sm">
-                       &copy; 2023 告白气球主题网站 | 仅作展示用途
-                   </p>
-               </div>
-           </div>
-       </div>
-   </footer>
- 
-   <!-- 返回顶部按钮 -->
-   <button id="back-to-top" class="fixed bottom-8 right-8 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300 z-50">
-       <i class="fa fa-arrow-up"></i>
-   </button>
- 
-   <script>
-       // 导航栏滚动效果
-       const navbar = document.getElementById('navbar');
-       const backToTop = document.getElementById('back-to-top');
-       
-       window.addEventListener('scroll', function() {
-           if (window.scrollY > 50) {
-               navbar.classList.add('bg-dark/90', 'backdrop-blur-md', 'shadow-md');
-               navbar.classList.remove('bg-transparent');
-               
-               backToTop.classList.remove('opacity-0', 'invisible');
-               backToTop.classList.add('opacity-100', 'visible');
-           } else {
-               navbar.classList.remove('bg-dark/90', 'backdrop-blur-md', 'shadow-md');
-               navbar.classList.add('bg-transparent');
-               
-               backToTop.classList.add('opacity-0', 'invisible');
-               backToTop.classList.remove('opacity-100', 'visible');
-           }
-       });
-       
-       // 移动端菜单切换
-       const mobileMenuButton = document.getElementById('mobile-menu-button');
-       const mobileMenu = document.getElementById('mobile-menu');
-       
-       mobileMenuButton.addEventListener('click', function() {
-           mobileMenu.classList.toggle('hidden');
-           if (mobileMenu.classList.contains('hidden')) {
-               mobileMenuButton.innerHTML = '<i class="fa fa-bars"></i>';
-           } else {
-               mobileMenuButton.innerHTML = '<i class="fa fa-times"></i>';
-           }
-       });
-       
-       // 平滑滚动
-       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-           anchor.addEventListener('click', function (e) {
-               e.preventDefault();
-               
-               // 关闭移动菜单（如果打开）
-               if (!mobileMenu.classList.contains('hidden')) {
-                   mobileMenu.classList.add('hidden');
-                   mobileMenuButton.innerHTML = '<i class="fa fa-bars"></i>';
-               }
-               
-               document.querySelector(this.getAttribute('href')).scrollIntoView({
-                   behavior: 'smooth'
-               });
-           });
-       });
-       
-       // 返回顶部
-       backToTop.addEventListener('click', function() {
-           window.scrollTo({
-               top: 0,
-               behavior: 'smooth'
-           });
-       });
-       
-       // 音乐播放控制
-       const playButton = document.getElementById('play-button');
-       const playButtonSmall = document.getElementById('play-button-small');
-       const progressBar = document.getElementById('progress-bar');
-       const currentTimeDisplay = document.getElementById('current-time');
-       const songPlayer = document.getElementById('song-player');
-       
-       let isPlaying = false;
-       let progress = 0;
-       let progressInterval;
-       
-       function togglePlay() {
-           isPlaying = !isPlaying;
-           
-           if (isPlaying) {
-               playButton.innerHTML = '<i class="fa fa-pause"></i>';
-               playButtonSmall.innerHTML = '<i class="fa fa-pause"></i>';
-               
-               // 模拟进度更新
-               progressInterval = setInterval(() => {
-                   progress += 0.1;
-                   if (progress > 100) progress = 0;
-                   progressBar.style.width = progress + '%';
-                   
-                   // 更新时间显示
-                   const totalSeconds = 215; // 3:35 in seconds
-                   const currentSeconds = Math.floor((progress / 100) * totalSeconds);
-                   const minutes = Math.floor(currentSeconds / 60);
-                   const seconds = currentSeconds % 60;
-                   currentTimeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-               }, 100);
-           } else {
-               playButton.innerHTML = '<i class="fa fa-play"></i>';
-               playButtonSmall.innerHTML = '<i class="fa fa-play"></i>';
-               clearInterval(progressInterval);
-           }
-       }
-       
-       playButton.addEventListener('click', togglePlay);
-       playButtonSmall.addEventListener('click', togglePlay);
-       
-       // 点击进度条更新进度
-       progressBar.parentElement.addEventListener('click', function(e) {
-           const rect = this.getBoundingClientRect();
-           const pos = (e.clientX - rect.left) / rect.width;
-           progress = pos * 100;
-           progressBar.style.width = progress + '%';
-       });
-   </script>
+<body>
+  <header>
+    <h1>Singapore PSI — Realtime Readings</h1>
+    <small>Source: <code>https://api.data.gov.sg/v1/environment/psi</code></small>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="toolbar">
+        <button id="refreshBtn" title="Fetch latest">Refresh</button>
+        <span class="status" id="status">Loading…</span>
+      </div>
+      <div class="wrap">
+        <table id="psiTable" aria-live="polite">
+          <thead id="thead"></thead>
+          <tbody id="tbody"></tbody>
+          <tfoot>
+            <tr><td colspan="99" id="meta" class="muted">—</td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="legend">
+        This table lists every reading returned by the API (e.g., <code>o3_sub_index</code> to
+        <code>psi_twenty_four_hourly</code>) across all regions (national, north, south, east, west, central).
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:16px">
+      Tip: If you see nothing, try again — occasionally the API may have a brief empty window while it rolls to a new timestamp.
+    </p>
+    <p id="error" class="error"></p>
+  </main>
+
+  <script>
+    const API = "https://api.data.gov.sg/v1/environment/psi";
+    const thead = document.getElementById("thead");
+    const tbody = document.getElementById("tbody");
+    const meta  = document.getElementById("meta");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    async function fetchPSI() {
+      statusEl.textContent = "Loading…";
+      errorEl.textContent = "";
+      try {
+        const res = await fetch(API, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const items = Array.isArray(data.items) ? data.items : [];
+        if (items.length === 0) {
+          throw new Error("No items in response.");
+        }
+
+        const item = items[0];
+        const readings = item.readings || {};
+        const readingNames = Object.keys(readings).sort();
+
+        // Determine region columns dynamically from the first reading
+        const firstReading = readings[readingNames[0]] || {};
+        const regionNames = Object.keys(firstReading).sort(); // e.g., ["central","east","national","north","south","west"]
+
+        // Build header
+        thead.innerHTML = "";
+        const thRow = document.createElement("tr");
+        const thReading = document.createElement("th");
+        thReading.textContent = "Reading";
+        thRow.appendChild(thReading);
+        for (const region of regionNames) {
+          const th = document.createElement("th");
+          th.textContent = region;
+          thRow.appendChild(th);
+        }
+        thead.appendChild(thRow);
+
+        // Build body
+        tbody.innerHTML = "";
+        for (const readingKey of readingNames) {
+          const row = document.createElement("tr");
+          const nameCell = document.createElement("td");
+          nameCell.textContent = readingKey;
+          row.appendChild(nameCell);
+
+          const regionObj = readings[readingKey] || {};
+          for (const region of regionNames) {
+            const td = document.createElement("td");
+            const val = regionObj[region];
+            td.textContent = (val ?? "") === "" ? "—" : Number.isFinite(val) ? Number(val).toFixed(2) : val;
+            row.appendChild(td);
+          }
+          tbody.appendChild(row);
+        }
+
+        // Meta
+        const ts = item.timestamp || data.update_timestamp || data.api_info?.status;
+        meta.textContent = `Timestamp: ${ts || "unknown"} · Regions: ${regionNames.join(", ")} · Readings: ${readingNames.length}`;
+
+        statusEl.textContent = "Loaded";
+      } catch (err) {
+        statusEl.textContent = "Error";
+        errorEl.textContent = `Failed to load PSI data: ${err.message}`;
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+        meta.textContent = "—";
+      }
+    }
+
+    refreshBtn.addEventListener("click", fetchPSI);
+    fetchPSI();
+  </script>
 </body>
 </html>
